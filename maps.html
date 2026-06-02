@@ -76,31 +76,68 @@
         /* Основной контент */
         main {
             padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Центрируем всё содержимое main по горизонтали */
         }
 
         .description {
-            margin-bottom: 20px;
-        }
-
-        .logo-container {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-size: 18px;
         }
 
-        .logo-container img {
-            max-width: 300px;
-        }
-
+        /* Контейнер карты */
         .maps-container {
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            justify-content: right; /* Центрируем карту */
+            width: 100%;
+            margin-bottom: 15px;
         }
 
         .maps-container img {
-            width: 45%;
+            width: 75%; /* Карта занимает 75% от ширины контента */
             height: auto;
             border: 1px solid #ccc;
+        }
+
+        /* Единая панель управления строго под картой */
+        .map-bottom-controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: right; /* Центрируем списки внутри панели */
+            gap: 25px;
+            border-radius: 4px;
+            width: 71%; /* Ширина панели теперь совпадает с визуальной шириной карты (75% + рамки/отступы) */
+            box-sizing: border-box; /* Чтобы padding не раздувал панель */
+        }
+
+        /* Элемент списка с подписью */
+        .control-item {
+            display: flex;
+            align-items: center; /* Выравнивание текста и селекта по вертикальной оси */
+            gap: 8px;
+        }
+
+        .control-item label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Красивое оформление самих выпадающих списков */
+        .control-item select {
+            padding: 6px 10px;
+            font-size: 14px;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            background-color: #ffffff;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .control-item select:focus {
+            border-color: #006d80; /* Цвет рамки при клике */
         }
 
         /* Подвал */
@@ -144,16 +181,53 @@
 
         <main>
             <div class="description">
-                Для получения карт перейдите во складку "Контакты" связавшись с владельцем сайта.
-            </div>
-
-            <div class="logo-container">
-                <img src="path_to_logo.png" alt="">
+                Композитные карты ECMWF.
             </div>
 
             <div class="maps-container">
-                <img src="" alt="">
-                <img src="" alt="">
+                <img id="forecast-map" src="data/ETR/SPC/scp_cfo_0h.png" alt="Карта погоды">
+            </div>
+
+            <div class="map-bottom-controls">
+                
+                <div class="control-item">
+                    <label for="region-select">Регион:</label>
+                    <select id="region-select">
+                        <option value="ETR">Центр ЕТР</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="param-select">Карта:</label>
+                    <select id="param-select">
+                        <option value="SPC">SCP (Индекс суперячеек)</option>
+                        <option value="STP">STP (Параметр знач. торнадо)</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="time-select">Время прогноза:</label>
+                    <select id="time-select">
+                        <option value="0">00 ч</option>
+                        <option value="3">03 ч</option>
+                        <option value="6">06 ч</option>
+                        <option value="9">09 ч</option>
+                        <option value="12">12 ч</option>
+                        <option value="15">15 ч</option>
+                        <option value="18">18 ч</option>
+                        <option value="21">21 ч</option>
+                        <option value="24">24 ч</option>
+                        <option value="27">27 ч</option>
+                        <option value="30">30 ч</option>
+                        <option value="33">33 ч</option>
+                        <option value="36">36 ч</option>
+                        <option value="39">39 ч</option>
+                        <option value="42">42 ч</option>
+                        <option value="45">45 ч</option>
+                        <option value="48">48 ч</option>
+                    </select>
+                </div>
+
             </div>
         </main>
 
@@ -165,6 +239,35 @@
         </footer>
 
     </div>
+
+    <script>
+        const regionSelect = document.getElementById('region-select');
+        const paramSelect = document.getElementById('param-select');
+        const timeSelect = document.getElementById('time-select');
+        const mapImage = document.getElementById('forecast-map');
+
+        function updateMap() {
+            const region = regionSelect.value;       
+            const param = paramSelect.value;         
+            const hour = timeSelect.value;           
+
+            // Определяем имя файла в зависимости от выбранного параметра
+            let fileNamePrefix;
+            if (param === 'SPC') {
+                fileNamePrefix = 'scp'; // Если папка SPC, файл начинается на scp
+            } else {
+                fileNamePrefix = param.toLowerCase(); // В остальных случаях просто переводим в нижний регистр (stp, mucape и т.д.)
+            }
+
+            // Собираем правильный путь
+            const newSrc = `data/${region}/${param}/${fileNamePrefix}_cfo_${hour}h.png`;
+            mapImage.src = newSrc;
+        }
+
+        regionSelect.addEventListener('change', updateMap);
+        paramSelect.addEventListener('change', updateMap);
+        timeSelect.addEventListener('change', updateMap);
+    </script>
 
 </body>
 </html>
