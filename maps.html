@@ -156,6 +156,28 @@
             height: 30px;
             margin: 0 10px;
         }
+
+        /* Стили для кнопок-стрелок */
+        .arrow-btn {
+            padding: 6px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none; /* Чтобы текст стрелки не выделялся синим при частых кликах */
+        }
+
+        .arrow-btn:hover {
+            background-color: #f0f0f0;
+            border-color: #006d80;
+        }
+
+        .arrow-btn:active {
+            background-color: #e0e0e0;
+        }
     </style>
 </head>
 <body>
@@ -202,31 +224,36 @@
                     <select id="param-select">
                         <option value="SPC">SCP (Индекс суперячеек)</option>
                         <option value="STP">STP (Параметр знач. торнадо)</option>
+                        <option value="SPC">MUCAPE</option>
                     </select>
                 </div>
 
                 <div class="control-item">
-                    <label for="time-select">Время прогноза:</label>
-                    <select id="time-select">
-                        <option value="0">00 ч</option>
-                        <option value="3">03 ч</option>
-                        <option value="6">06 ч</option>
-                        <option value="9">09 ч</option>
-                        <option value="12">12 ч</option>
-                        <option value="15">15 ч</option>
-                        <option value="18">18 ч</option>
-                        <option value="21">21 ч</option>
-                        <option value="24">24 ч</option>
-                        <option value="27">27 ч</option>
-                        <option value="30">30 ч</option>
-                        <option value="33">33 ч</option>
-                        <option value="36">36 ч</option>
-                        <option value="39">39 ч</option>
-                        <option value="42">42 ч</option>
-                        <option value="45">45 ч</option>
-                        <option value="48">48 ч</option>
-                    </select>
-                </div>
+                <label for="time-select">Время прогноза:</label>
+                <button type="button" id="prev-time-btn" class="arrow-btn">&larr;</button>
+                
+                <select id="time-select">
+                    <option value="0">00 ч</option>
+                    <option value="3">03 ч</option>
+                    <option value="6">06 ч</option>
+                    <option value="9">09 ч</option>
+                    <option value="12">12 ч</option>
+                    <option value="15">15 ч</option>
+                    <option value="18">18 ч</option>
+                    <option value="21">21 ч</option>
+                    <option value="24">24 ч</option>
+                    <option value="27">27 ч</option>
+                    <option value="30">30 ч</option>
+                    <option value="33">33 ч</option>
+                    <option value="36">36 ч</option>
+                    <option value="39">39 ч</option>
+                    <option value="42">42 ч</option>
+                    <option value="45">45 ч</option>
+                    <option value="48">48 ч</option>
+                </select>
+                
+                <button type="button" id="next-time-btn" class="arrow-btn">&rarr;</button>
+            </div>
 
             </div>
         </main>
@@ -245,28 +272,49 @@
         const paramSelect = document.getElementById('param-select');
         const timeSelect = document.getElementById('time-select');
         const mapImage = document.getElementById('forecast-map');
+        
+        // Новые элементы кнопок
+        const prevTimeBtn = document.getElementById('prev-time-btn');
+        const nextTimeBtn = document.getElementById('next-time-btn');
 
         function updateMap() {
             const region = regionSelect.value;       
             const param = paramSelect.value;         
             const hour = timeSelect.value;           
 
-            // Определяем имя файла в зависимости от выбранного параметра
             let fileNamePrefix;
             if (param === 'SPC') {
-                fileNamePrefix = 'scp'; // Если папка SPC, файл начинается на scp
+                fileNamePrefix = 'scp'; 
             } else {
-                fileNamePrefix = param.toLowerCase(); // В остальных случаях просто переводим в нижний регистр (stp, mucape и т.д.)
+                fileNamePrefix = param.toLowerCase(); 
             }
 
-            // Собираем правильный путь
             const newSrc = `data/${region}/${param}/${fileNamePrefix}_cfo_${hour}h.png`;
             mapImage.src = newSrc;
         }
 
+        // Слушатели для выпадающих списков
         regionSelect.addEventListener('change', updateMap);
         paramSelect.addEventListener('change', updateMap);
         timeSelect.addEventListener('change', updateMap);
+
+        // Логика кнопки «Назад»
+        prevTimeBtn.addEventListener('click', function() {
+            // Если текущий кадр не самый первый, уменьшаем индекс на 1
+            if (timeSelect.selectedIndex > 0) {
+                timeSelect.selectedIndex--;
+                updateMap(); // Обновляем картинку
+            }
+        });
+
+        // Логика кнопки «Вперед»
+        nextTimeBtn.addEventListener('click', function() {
+            // Если текущий кадр не последний, увеличиваем индекс на 1
+            if (timeSelect.selectedIndex < timeSelect.options.length - 1) {
+                timeSelect.selectedIndex++;
+                updateMap(); // Обновляем картинку
+            }
+        });
     </script>
 
 </body>
